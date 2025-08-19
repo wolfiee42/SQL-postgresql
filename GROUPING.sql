@@ -2,9 +2,15 @@ SELECT author_id, COUNT(*) AS total_posts FROM posts GROUP BY author_id;
 
 SELECT role, COUNT(*) AS total_users FROM users GROUP BY role;
 
--- FIND USERS WITH 2 POST AND ABOVE, USER ID AND NAME
-SELECT users.name, users.id, COUNT (posts.id) AS post_count 
-FROM users, posts  
-GROUP BY users.id, users.name;
-
-SELECT * FROM users, posts;
+-- get all published post with their author and category
+SELECT 
+	p.id AS post_id,
+	p.title, 
+	p.status, 
+	u.name AS author, 
+	c.name AS category
+FROM posts p
+INNER JOIN users u ON p.author_id = u.id
+INNER JOIN post_categories pc ON p.id = pc.post_id
+INNER JOIN categories c ON pc.category_id = c.id
+WHERE p.status = 'approaved';
