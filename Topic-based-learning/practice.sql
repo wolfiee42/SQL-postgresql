@@ -64,99 +64,11 @@ LEFT JOIN rental r ON c.customer_id = r.customer_id
 LEFT JOIN film f ON r.film_id = f.film_id;
 
 
-SELECT c.first_name, c.last_name , COUNT(*) AS rent
+SELECT r.customer_id , COUNT(*) AS rent
 FROM rental r
-JOIN customer c ON r.customer_id = c.customer_id
-GROUP BY r.customer_id,  c.first_name, c.last_name
+GROUP BY customer_id
 ORDER BY rent DESC
-LIMIT 5;
-
-
-
-SELECT 
-	c.first_name, 
-	c.last_name,
-	rc.rent
-FROM customer c
-JOIN (
-	SELECT 
-		customer_id,
-		COUNT(*) AS rent
-	FROM rental
-	GROUP BY customer_id
-) rc ON c.customer_id = rc.customer_id
-ORDER BY rc.rent DESC
-LIMIT 5;
-
-
-
--- customers who rented more than 3
--- name of the films
-
-
-SELECT 
-	f.title, 
-	r.customer_id
-FROM rental r
-JOIN film f ON f.film_id = r.film_id
-WHERE r.customer_id IN (
-	SELECT 
-		customer_id
-	FROM rental
-	GROUP BY customer_id
-	HAVING COUNT(*) > 3
-);
-
-SELECT f.title, r.customer_id
-FROM rental r
-JOIN film f ON r.film_id = f.film_id
-WHERE r.customer_id IN (
-    SELECT customer_id
-    FROM rental
-    GROUP BY customer_id
-    HAVING COUNT(*) > 3
-);
-
-
-CREATE VIEW customer_rental_summary AS
-SELECT c.customer_id, c.first_name, c.last_name, COUNT(r.rental_id) AS total_rentals
-FROM customer c
-LEFT JOIN rental r ON c.customer_id = r.customer_id
-GROUP BY c.customer_id;
-
-SELECT * FROM customer_rental_summary;
-
-DROP VIEW customer_rental_summary;
-
-
-
-
-
-
-CREATE MATERIALIZED VIEW popular_films AS
-SELECT f.film_id, f.title, COUNT(r.rental_id) AS total_rentals
-FROM film f
-JOIN rental r ON f.film_id = r.film_id
-GROUP BY f.film_id
-ORDER BY total_rentals DESC;
-
-
-SELECT * FROM popular_films;
-
-
-REFRESH MATERIALIZED VIEW popular_films;
-
-
-
-INSERT INTO rental (customer_id, film_id, rental_date)
-VALUES
-(1, 5, '2025-09-25'),
-(2, 6, '2025-09-26'),
-(3, 7, '2025-09-27');
-
-
-
-
+JOIN customer c ON r.customer_id = c.customer_;
 
 
 
