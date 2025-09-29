@@ -99,7 +99,18 @@ CREATE TABLE jobs (
   PRIMARY KEY (id, created_at)
 ) PARTITION BY RANGE(created_at);
 
+-- Partitioned by month
+CREATE TABLE jobs_2025_01 PARTITION OF jobs
+    FOR VALUES FROM ('2025-01-01') TO ('2025-02-01');
 
+CREATE TABLE jobs_2025_02 PARTITION OF jobs
+    FOR VALUES FROM ('2025-02-01') TO ('2025-03-01');
+
+CREATE TABLE jobs_2025_03 PARTITION OF jobs
+    FOR VALUES FROM ('2025-03-01') TO ('2025-04-01');
+
+CREATE TABLE jobs_2025_04 PARTITION OF jobs
+    FOR VALUES FROM ('2025-04-01') TO ('2025-05-01');
 
 -- Find jobs with a specific budget
 CREATE INDEX idx_jobs_budget_amount ON jobs(budget_amount);
@@ -115,7 +126,7 @@ CREATE INDEX idx_jobs_status_budget_type_amount ON jobs(status, budget_type, bud
 
 -- Job Skills
 CREATE TABLE job_skills (
-  job_id INT REFERENCES jobs(id) ON DELETE CASCADE,
+  job_id INT,
   skill_id INT REFERENCES skills(id) ON DELETE CASCADE,
   created_at TIMESTAMP WITH TIME ZONE,
   PRIMARY KEY (job_id, created_at, skill_id),
