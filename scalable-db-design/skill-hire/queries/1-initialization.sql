@@ -27,6 +27,18 @@ CREATE INDEX idx_users_user_type ON users(type); -- for user type filtering
 -- Could be important in our scenarios
 CREATE INDEX idx_users_type_status ON users(type, account_status); 
 
+
+-- RESET  token
+CREATE TABLE reset_tokens(
+	id SERIAL NOT NULL PRIMARY KEY,
+	user_id SERIAL NOT NULL REFERENCES users(id),
+	token VARCHAR(100) NOT NULL,
+	expires_in TIMESTAMPTZ NOT NULL DEFAULT (CURRENT_TIMESTAMP + INTERVAL '5 minutes'),
+	used BOOLEAN NOT NULL DEFAULT FALSE
+)
+
+CREATE INDEX idx_reset_tokens_user_id ON reset_tokens(user_id);
+
 -- Freelancer Profiles
 CREATE TABLE freelancer_profiles (
 	id SERIAL PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE, -- PK, FK to users
@@ -133,6 +145,15 @@ CREATE TABLE job_skills (
   FOREIGN KEY (job_id, created_at) REFERENCES jobs(id, created_at) ON DELETE CASCADE
 );
 
+-- Job Categories
+CREATE TABLE job_categories(
+	job_id INT NOT NULL ,
+	category_id INT NOT NULL REFERENCES categories(id),
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+	PRIMARY KEY (job_id, category_id, created_at),
+	FOREIGN KEY (job_id, created_at) REFERENCES jobs(id, created_at)
+)
+
 
 -- Application status enum
 CREATE TYPE application_status AS ENUM ('pending', 'accepted', 'rejected');
@@ -155,6 +176,15 @@ CREATE TABLE applications (
 
 CREATE INDEX idx_applications_job_id ON applications(job_id);
 CREATE INDEX idx_applications_freelancer_id ON applications(freelancer_id);
+
+
+-- Application Count Table
+CREATE TABLE application_counts (
+	id SERIAL PRIMARY KEY REFERENCES applications(id),
+	count INT NOT NULL DEFAULT 0
+)
+
+CREATE INDEX idx_application_counts ON application_counts(id);
 
 -- Project status enum
 CREATE TYPE project_status AS ENUM ('pending', 'in_progress', 'completed', 'cancelled');
